@@ -4,25 +4,31 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import {images} from "../../constants"
 import FormField from '../../components/FormField'
 import CustomButton from '../../components/CustomButton'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 import { signIn } from '../../lib/appwrite'
+import { useGlobalContext } from '../../context/GlobalProvider'
 const SignIn = () => {
     const [form,setForm]=useState({
         email:'',
         password:''
     })
+
+    const {setUser,setIsLoggedin}=useGlobalContext();
     const submit=async ()=>{
-        if(!form.email || !form.password) {
+        if(form.email==="" || form.password==="") {
             Alert.alert('Error','Please fill out all fields');
             return;
         }
         setisSubmitting(true);
         try {
-            await signIn(form.email, form.password);
-            Alert.alert('Success', 'Account Logged In Successfully');
+            const result=await signIn(form.email, form.password);
+            // Alert.alert('Success', 'Account Logged In Successfully');
             ////// set global state
+            setUser(result);
+            setIsLoggedin(true);
             router.replace('/home');
         } catch (error) {
+            console.log("inside signin page");
         console.log(error);
 
             Alert.alert('Error', error.message);
